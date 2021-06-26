@@ -32,7 +32,7 @@ def main():
             transactionWorkbook, portfolioWorkbook)
 
         TransactionProcessor.updateTransactions(
-            newTransactions, openTransactions, alreadyReadTransactions, maximumTransactionNumber)
+            newTransactions, openTransactions, alreadyReadTransactions, maximumTransactionNumber, InitialTransactionReader.YELLOBARINOVERALLDATASHEETROW)
         DataSheetWriter.writeTransactions(
             allWriteableTransactions, portfolioWorkbook[InitialTransactionReader.OVERALLDATASHEETNAME], InitialTransactionReader.YELLOBARINOVERALLDATASHEETROW)
 

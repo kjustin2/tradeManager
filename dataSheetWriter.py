@@ -45,9 +45,9 @@ def writeTransactionToData(transaction, dataSheet, currentRow, writeToLog):
 
 def writeFormulaInformation(transaction, dataSheet, currentRow, writeToLog):
     Helper.writeToFile(writeToLog, 'currentValue', dataSheet,
-                       14, currentRow, Helper.getSymbolFormula(transaction.symbol))
+                       14, currentRow, Helper.getValueFormula(transaction.symbol))
     Helper.writeToFile(writeToLog, 'currentAsk', dataSheet,
-                       15, currentRow, Helper.getDateFormula(transaction))
+                       15, currentRow, Helper.getAskFormula(transaction))
 
     Helper.writeToFile(writeToLog, 'NetPrem', dataSheet,
                        16, currentRow, """=IF([TransType]=\"LS\", [OpnPrem]+[ClsPrem],

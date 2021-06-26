@@ -2,8 +2,10 @@ import helperMethods as Helper
 from os import close
 
 
-def updateTransactions(newTransactions, openTransactions, alreadyReadTransactions,  maximumTransactionNumber):
-    lastCurrentRow = alreadyReadTransactions[-1].row
+def updateTransactions(newTransactions, openTransactions, alreadyReadTransactions,  maximumTransactionNumber, yellowBarRow):
+    lastCurrentRow = yellowBarRow + 1
+    if len(alreadyReadTransactions) > 0:
+        lastCurrentRow = alreadyReadTransactions[-1].row
     currentUpdateRow = lastCurrentRow + 1
     for transaction in newTransactions:
         if transaction.type == 'REMOVAL':

@@ -69,20 +69,23 @@ def getMonthNumber(monthSpelledOut):
     return datetime_object.month
 
 
-def getSymbolFormula(symbol):
+def getValueFormula(symbol):
     return '=RTD("tos.rtd",,"last", "' + symbol + '")'
 
 
-def getDateFormula(newTransaction):
+def getAskFormula(newTransaction):
     base = '=RTD("tos.rtd",,"ASK",".'
     strike = str(newTransaction.strike)
     strike = strike.replace('.0', '')
+    day = str(newTransaction.day)
+    if len(day) == 1:
+        day = '0' + day
     month = str(getMonthNumber(newTransaction.month))
     if len(month) == 1:
         month = '0' + month
     year = str(newTransaction.year)[2:]
     symbolDate = newTransaction.symbol + year + \
-        month + str(newTransaction.day) + 'P' + strike
+        month + day + 'P' + strike
     return base + symbolDate + '")'
 
 
