@@ -22,7 +22,7 @@ def updateRemovalTransaction(transaction, openTransactions, alreadyReadTransacti
     for openTransaction in openTransactions:
         if transaction.symbol == openTransaction.symbol:
             matchingOpenTransactions.append(openTransaction)
-    if len(matchingOpenTransactions) == 1:
+    if len(matchingOpenTransactions) == 1 or transactionsSameTradeNumber(matchingOpenTransactions):
         transaction.transactionDate = matchingOpenTransactions[0].expirationDate
         updateClosedOpenTransactions(transaction, matchingOpenTransactions,
                                      openTransactions, alreadyReadTransactions)
@@ -34,6 +34,14 @@ def updateRemovalTransaction(transaction, openTransactions, alreadyReadTransacti
         transaction.transactionDate = closeableTransactions[0].expirationDate
         updateClosedOpenTransactions(transaction, closeableTransactions,
                                      openTransactions, alreadyReadTransactions)
+
+
+def transactionsSameTradeNumber(transactions):
+    tradeNumber = transactions[0].trade
+    for transaction in transactions:
+        if transaction.trade != tradeNumber:
+            return False
+    return True
 
 
 def getCloseableTransactionsForRemoval(matchingOpenTransactions, newTransaction, maximumTransactionNumber):
