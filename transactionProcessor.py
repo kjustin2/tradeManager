@@ -37,11 +37,13 @@ def updateRemovalTransaction(transaction, openTransactions, alreadyReadTransacti
 
 
 def transactionsSameTradeNumber(transactions):
-    tradeNumber = transactions[0].trade
-    for transaction in transactions:
-        if transaction.trade != tradeNumber:
-            return False
-    return True
+    if len(transactions) > 0:
+        tradeNumber = transactions[0].trade
+        for transaction in transactions:
+            if transaction.trade != tradeNumber:
+                return False
+        return True
+    return False
 
 
 def getCloseableTransactionsForRemoval(matchingOpenTransactions, newTransaction, maximumTransactionNumber):
@@ -62,6 +64,7 @@ def getRemovalTradeNumber(matchingOpenTransactions, newTransaction, maximumTrans
     print("YOUR CURRENT REMOVAL ---------")
     print("REMOVAL SYMBOL " + newTransaction.symbol)
     print("REMOVAL WORDS " + newTransaction.transactionWords)
+    print("REMOVAL DATE " + str(newTransaction.transactionDate))
     print("END ---------")
     tryInput = True
     while tryInput:
@@ -146,8 +149,11 @@ def findTransactionNumberAndLatestLeg(newTransaction, openTransactions, maximumT
     matchingOpenTransactions = getMatchingOpenTransanctions(
         newTransaction, openTransactions)
     if len(matchingOpenTransactions) > 0:
-        transactionNumber = getNewTransactionNumberAfterMatching(
+        transactionNumber = checkForMatchingTransaction(
             matchingOpenTransactions, newTransaction)
+        if transactionNumber == None:
+            transactionNumber = getNewTransactionNumberAfterMatching(
+                matchingOpenTransactions, newTransaction, maximumTransactionNumber)
         if transactionNumber <= maximumTransactionNumber:
             transactionLeg = getTransactionLegByTransactionNumber(
                 matchingOpenTransactions)
@@ -156,7 +162,14 @@ def findTransactionNumberAndLatestLeg(newTransaction, openTransactions, maximumT
     return int(transactionNumber), int(transactionLeg + 1)
 
 
-def getNewTransactionNumberAfterMatching(matchingOpenTransactions, newTransaction):
+def checkForMatchingTransaction(matchingOpenTransactions, newTransaction):
+    for transaction in matchingOpenTransactions:
+        if transaction.lightEquals(newTransaction):
+            return transaction.trade
+    return None
+
+
+def getNewTransactionNumberAfterMatching(matchingOpenTransactions, newTransaction, maximumTransactionNumber):
     print("MATCHING OPEN TRADES ---------")
     for transaction in matchingOpenTransactions:
         printTransactionNumberHelpfulSummary(transaction)
@@ -164,6 +177,7 @@ def getNewTransactionNumberAfterMatching(matchingOpenTransactions, newTransactio
     print("YOUR CURRENT TRADE ---------")
     printTransactionNumberHelpfulSummary(newTransaction)
     print("END ---------")
+    print('Latest Trade Number: ' + str(maximumTransactionNumber))
     tryInput = True
     while tryInput:
         try:
@@ -176,14 +190,14 @@ def getNewTransactionNumberAfterMatching(matchingOpenTransactions, newTransactio
 
 
 def printTransactionNumberHelpfulSummary(transaction):
-    if transaction.leg:
-        print("TRADE LEG " + str(transaction.leg))
-    else:
-        print("NO TRADE LEG YET")
     if transaction.trade:
         print("TRADE NUMBER " + str(transaction.trade))
     else:
         print("NO TRADE NUMBER YET")
+    if transaction.leg:
+        print("TRADE LEG " + str(transaction.leg))
+    else:
+        print("NO TRADE LEG YET")
     print("TRANSACTION DATE " +
           transaction.transactionDate.strftime("%m/%d/%Y"))
     print("TRANSACTION WORDS " + transaction.transactionWords)
