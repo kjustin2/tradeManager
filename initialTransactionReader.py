@@ -35,7 +35,7 @@ def addOldTransactionToArray(row, array):
 def turnProcessingRowsToTransactions(rows):
     alreadyReadTransactions = []
     openTransactions = []
-    maximumTransactionNumber = 0
+    maximumTradeNumber = 0
     for count, row in enumerate(rows):
         if count > YELLOBARINOVERALLDATASHEETROW and row[0].value != None:
             addOldTransactionToArray(row, alreadyReadTransactions)
@@ -43,9 +43,9 @@ def turnProcessingRowsToTransactions(rows):
             if closeDate == None:
                 addOldTransactionToArray(row, openTransactions)
             tradeNumber = row[1].value
-            if tradeNumber > maximumTransactionNumber:
-                maximumTransactionNumber = tradeNumber
-    return alreadyReadTransactions, openTransactions, maximumTransactionNumber
+            if tradeNumber > maximumTradeNumber:
+                maximumTradeNumber = tradeNumber
+    return alreadyReadTransactions, openTransactions, maximumTradeNumber
 
 
 def getNewTransactions(transactionWorkbook, alreadyReadTransactions):

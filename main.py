@@ -16,23 +16,24 @@ def checkExceptionMessaging(exceptionMessage):
 
 
 def getTransactions(transactionWorkbook, portfolioWorkbook):
-    alreadyReadTransactions, openTransactions, maximumTransactionNumber = InitialTransactionReader.readOldTransactions(
+    alreadyReadTransactions, openTransactions, maximumTradeNumber = InitialTransactionReader.readOldTransactions(
         portfolioWorkbook)
     newTransactions = InitialTransactionReader.getNewTransactions(
         transactionWorkbook, alreadyReadTransactions)
     writeableNewTransactions = Helper.getWriteableTransactions(newTransactions)
     allWriteableTransactions = alreadyReadTransactions + writeableNewTransactions
-    return alreadyReadTransactions, openTransactions, newTransactions, maximumTransactionNumber, allWriteableTransactions
+    return alreadyReadTransactions, openTransactions, newTransactions, maximumTradeNumber, allWriteableTransactions
 
 
 def main():
     try:
         transactionWorkbook, portfolioWorkbook = InitialTransactionReader.openWorksbooks()
-        alreadyReadTransactions, openTransactions, newTransactions, maximumTransactionNumber, allWriteableTransactions = getTransactions(
+        alreadyReadTransactions, openTransactions, newTransactions, maximumTradeNumber, allWriteableTransactions = getTransactions(
             transactionWorkbook, portfolioWorkbook)
 
         TransactionProcessor.updateTransactions(
-            newTransactions, openTransactions, alreadyReadTransactions, maximumTransactionNumber, InitialTransactionReader.YELLOBARINOVERALLDATASHEETROW)
+            newTransactions, openTransactions, alreadyReadTransactions, maximumTradeNumber, InitialTransactionReader.YELLOBARINOVERALLDATASHEETROW,
+            allWriteableTransactions)
         DataSheetWriter.writeTransactions(
             allWriteableTransactions, portfolioWorkbook[InitialTransactionReader.OVERALLDATASHEETNAME], InitialTransactionReader.YELLOBARINOVERALLDATASHEETROW)
 

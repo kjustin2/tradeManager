@@ -2,7 +2,7 @@ import helperMethods as Helper
 from os import close
 
 
-def updateTransactions(newTransactions, openTransactions, alreadyReadTransactions,  maximumTransactionNumber, yellowBarRow):
+def updateTransactions(newTransactions, openTransactions, alreadyReadTransactions,  maximumTradeNumber, yellowBarRow, allWriteableTransactions):
     lastCurrentRow = yellowBarRow + 1
     if len(alreadyReadTransactions) > 0:
         lastCurrentRow = alreadyReadTransactions[-1].row
@@ -10,14 +10,15 @@ def updateTransactions(newTransactions, openTransactions, alreadyReadTransaction
     for transaction in newTransactions:
         if transaction.type == 'REMOVAL':
             updateRemovalTransaction(
-                transaction, openTransactions, alreadyReadTransactions, maximumTransactionNumber)
+                transaction, openTransactions, alreadyReadTransactions, maximumTradeNumber)
         else:
-            maximumTransactionNumber = updateNewTransactionGetNewMaxTransaction(transaction, openTransactions,
-                                                                                currentUpdateRow, maximumTransactionNumber, alreadyReadTransactions)
+            maximumTradeNumber = updateNewTransactionGetNewMaxTransaction(transaction, openTransactions,
+                                                                          currentUpdateRow, maximumTradeNumber, alreadyReadTransactions,
+                                                                          allWriteableTransactions)
             currentUpdateRow += 1
 
 
-def updateRemovalTransaction(transaction, openTransactions, alreadyReadTransactions, maximumTransactionNumber):
+def updateRemovalTransaction(transaction, openTransactions, alreadyReadTransactions, maximumTradeNumber):
     matchingOpenTransactions = []
     for openTransaction in openTransactions:
         if transaction.symbol == openTransaction.symbol:
@@ -30,7 +31,7 @@ def updateRemovalTransaction(transaction, openTransactions, alreadyReadTransacti
         return
     else:
         closeableTransactions = getCloseableTransactionsForRemoval(
-            matchingOpenTransactions, transaction, maximumTransactionNumber)
+            matchingOpenTransactions, transaction, maximumTradeNumber)
         transaction.transactionDate = closeableTransactions[0].expirationDate
         updateClosedOpenTransactions(transaction, closeableTransactions,
                                      openTransactions, alreadyReadTransactions)
@@ -46,9 +47,9 @@ def transactionsSameTradeNumber(transactions):
     return False
 
 
-def getCloseableTransactionsForRemoval(matchingOpenTransactions, newTransaction, maximumTransactionNumber):
+def getCloseableTransactionsForRemoval(matchingOpenTransactions, newTransaction, maximumTradeNumber):
     tradeNumber = getRemovalTradeNumber(
-        matchingOpenTransactions, newTransaction, maximumTransactionNumber)
+        matchingOpenTransactions, newTransaction, maximumTradeNumber)
     closeableTransactions = []
     for transaction in matchingOpenTransactions:
         if transaction.trade == tradeNumber:
@@ -56,10 +57,10 @@ def getCloseableTransactionsForRemoval(matchingOpenTransactions, newTransaction,
     return closeableTransactions
 
 
-def getRemovalTradeNumber(matchingOpenTransactions, newTransaction, maximumTransactionNumber):
+def getRemovalTradeNumber(matchingOpenTransactions, newTransaction, maximumTradeNumber):
     print("REMOVAL MATCHING OPEN TRADES ---------")
     for transaction in matchingOpenTransactions:
-        printTransactionNumberHelpfulSummary(transaction)
+        printTradeNumberHelpfulSummary(transaction)
     print("END ---------")
     print("YOUR CURRENT REMOVAL ---------")
     print("REMOVAL SYMBOL " + newTransaction.symbol)
@@ -70,7 +71,7 @@ def getRemovalTradeNumber(matchingOpenTransactions, newTransaction, maximumTrans
     while tryInput:
         try:
             transactionNumber = int(input("Enter the correct trade number: "))
-            if transactionNumber > maximumTransactionNumber:
+            if transactionNumber > maximumTradeNumber:
                 raise Exception()
             tryInput = False
         except:
@@ -80,10 +81,10 @@ def getRemovalTradeNumber(matchingOpenTransactions, newTransaction, maximumTrans
 
 
 def updateNewTransactionGetNewMaxTransaction(newTransaction, openTransactions,
-                                             currentRow, maximumTransactionNumber, alreadyReadTransactions):
+                                             currentRow, maximumTradeNumber, alreadyReadTransactions, allWriteableTransactions):
     newTransaction.row = int(currentRow)
-    newTransaction.trade, newTransaction.leg = findTransactionNumberAndLatestLeg(newTransaction, openTransactions,
-                                                                                 maximumTransactionNumber)
+    newTransaction.trade, newTransaction.leg = findTradeNumberAndLatestLeg(newTransaction, openTransactions,
+                                                                           maximumTradeNumber, alreadyReadTransactions, allWriteableTransactions)
     closeableTransactions = getCloseableTransactions(
         newTransaction, openTransactions)
     if closeableTransactions == None:
@@ -91,9 +92,9 @@ def updateNewTransactionGetNewMaxTransaction(newTransaction, openTransactions,
     else:
         updateClosedOpenTransactions(newTransaction, closeableTransactions,
                                      openTransactions, alreadyReadTransactions)
-    if newTransaction.trade > maximumTransactionNumber:
-        maximumTransactionNumber = newTransaction.trade
-    return maximumTransactionNumber
+    if newTransaction.trade > maximumTradeNumber:
+        maximumTradeNumber = newTransaction.trade
+    return maximumTradeNumber
 
 
 def getCloseableTransactions(newTransaction, openTransactions):
@@ -143,23 +144,23 @@ def getNewOpenTransactionsAfterClosing(closeableTransactions, openTransactions):
     return newOpenTransactions
 
 
-def findTransactionNumberAndLatestLeg(newTransaction, openTransactions, maximumTransactionNumber):
-    transactionNumber = -1
+def findTradeNumberAndLatestLeg(newTransaction, openTransactions, maximumTradeNumber, alreadyReadTransactions, allWriteableTransactions):
+    tradeNumber = -1
     transactionLeg = 0
     matchingOpenTransactions = getMatchingOpenTransanctions(
         newTransaction, openTransactions)
     if len(matchingOpenTransactions) > 0:
-        transactionNumber = checkForMatchingTransaction(
+        tradeNumber = checkForMatchingTransaction(
             matchingOpenTransactions, newTransaction)
-        if transactionNumber == None:
-            transactionNumber = getNewTransactionNumberAfterMatching(
-                matchingOpenTransactions, newTransaction, maximumTransactionNumber)
-        if transactionNumber <= maximumTransactionNumber:
-            transactionLeg = getTransactionLegByTransactionNumber(
-                matchingOpenTransactions)
+        if tradeNumber == None:
+            tradeNumber = getNewTradeNumberAfterMatching(
+                matchingOpenTransactions, newTransaction, maximumTradeNumber)
+        if tradeNumber <= maximumTradeNumber:
+            transactionLeg = getTransactionLegByTradeNumber(
+                tradeNumber, allWriteableTransactions)
     else:
-        transactionNumber = maximumTransactionNumber + 1
-    return int(transactionNumber), int(transactionLeg + 1)
+        tradeNumber = maximumTradeNumber + 1
+    return int(tradeNumber), int(transactionLeg + 1)
 
 
 def checkForMatchingTransaction(matchingOpenTransactions, newTransaction):
@@ -169,15 +170,15 @@ def checkForMatchingTransaction(matchingOpenTransactions, newTransaction):
     return None
 
 
-def getNewTransactionNumberAfterMatching(matchingOpenTransactions, newTransaction, maximumTransactionNumber):
+def getNewTradeNumberAfterMatching(matchingOpenTransactions, newTransaction, maximumTradeNumber):
     print("MATCHING OPEN TRADES ---------")
     for transaction in matchingOpenTransactions:
-        printTransactionNumberHelpfulSummary(transaction)
+        printTradeNumberHelpfulSummary(transaction)
     print("END ---------")
     print("YOUR CURRENT TRADE ---------")
-    printTransactionNumberHelpfulSummary(newTransaction)
+    printTradeNumberHelpfulSummary(newTransaction)
     print("END ---------")
-    print('Latest Trade Number: ' + str(maximumTransactionNumber))
+    print('Latest Trade Number: ' + str(maximumTradeNumber))
     tryInput = True
     while tryInput:
         try:
@@ -189,7 +190,7 @@ def getNewTransactionNumberAfterMatching(matchingOpenTransactions, newTransactio
     return transactionNumber
 
 
-def printTransactionNumberHelpfulSummary(transaction):
+def printTradeNumberHelpfulSummary(transaction):
     if transaction.trade:
         print("TRADE NUMBER " + str(transaction.trade))
     else:
@@ -203,10 +204,10 @@ def printTransactionNumberHelpfulSummary(transaction):
     print("TRANSACTION WORDS " + transaction.transactionWords)
 
 
-def getTransactionLegByTransactionNumber(matchingOpenTransactions):
+def getTransactionLegByTradeNumber(tradeNumber, allWriteableTransactions):
     maxLegNumber = -1
-    for transaction in matchingOpenTransactions:
-        if transaction.leg > maxLegNumber:
+    for transaction in allWriteableTransactions:
+        if transaction.trade == tradeNumber and transaction.leg > maxLegNumber:
             maxLegNumber = transaction.leg
     return maxLegNumber
 
