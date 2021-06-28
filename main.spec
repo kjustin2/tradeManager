@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['C:\\Users\\jkramer\\Downloads\\excel'],
+             pathex=['C:\\Users\\jkramer\\Downloads\\tradeManager'],
              binaries=[],
              datas=[],
              hiddenimports=[],
