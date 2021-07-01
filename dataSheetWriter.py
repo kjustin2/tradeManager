@@ -2,14 +2,24 @@ import helperMethods as Helper
 from os import close
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
+def clearEditableData(allWriteableTransactions, dataSheet, yellowBarRow):
+    currentRow, endRow = findEditableRows(allWriteableTransactions, dataSheet, yellowBarRow)
+    editableRowRange = 'A' + str(currentRow) + ':' + 'BZ' + str(endRow)
+    for row in dataSheet[editableRowRange]:
+        for cell in row:
+            cell.value = None
+
+def findEditableRows(allWriteableTransactions, dataSheet, yellowBarRow):
+    currentRow = yellowBarRow + 2
+    endRow = currentRow + len(allWriteableTransactions) - 1
+    return currentRow, endRow
 
 def writeTransactions(allWriteableTransactions, dataSheet, yellowBarRow):
     writeToLog = open('log.txt', 'w')
     allWriteableTransactions.sort(key=lambda x: (x.trade, x.leg))
-    currentRow = yellowBarRow + 2
-    startRow = yellowBarRow + 1
-    endRow = currentRow + len(allWriteableTransactions) - 1
-    addTable(dataSheet, startRow, endRow)
+    currentRow, endRow = findEditableRows(allWriteableTransactions, dataSheet, yellowBarRow)
+    startTableRow = yellowBarRow + 1
+    addTable(dataSheet, startTableRow, endRow)
     for transaction in allWriteableTransactions:
         writeTransactionToData(
             transaction, dataSheet, currentRow, writeToLog)

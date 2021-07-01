@@ -34,6 +34,8 @@ def main():
         TransactionProcessor.updateTransactions(
             newTransactions, openTransactions, alreadyReadTransactions, maximumTradeNumber, InitialTransactionReader.YELLOBARINOVERALLDATASHEETROW,
             allWriteableTransactions)
+
+        DataSheetWriter.clearEditableData(allWriteableTransactions, portfolioWorkbook[InitialTransactionReader.OVERALLDATASHEETNAME], InitialTransactionReader.YELLOBARINOVERALLDATASHEETROW)
         DataSheetWriter.writeTransactions(
             allWriteableTransactions, portfolioWorkbook[InitialTransactionReader.OVERALLDATASHEETNAME], InitialTransactionReader.YELLOBARINOVERALLDATASHEETROW)
 
