@@ -3,6 +3,7 @@ import helperMethods as Helper
 import initialTransactionReader as InitialTransactionReader
 import transactionProcessor as TransactionProcessor
 import dataSheetWriter as DataSheetWriter
+import sys
 
 
 def checkExceptionMessaging(exceptionMessage):
@@ -25,7 +26,7 @@ def getTransactions(transactionWorkbook, portfolioWorkbook):
     return alreadyReadTransactions, openTransactions, newTransactions, maximumTradeNumber, allWriteableTransactions
 
 
-def main():
+def main(args):
     try:
         transactionWorkbook, portfolioWorkbook = InitialTransactionReader.openWorksbooks()
         alreadyReadTransactions, openTransactions, newTransactions, maximumTradeNumber, allWriteableTransactions = getTransactions(
@@ -53,4 +54,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) > 1 and sys.argv[1] == 'DEBUG':
+        Helper.DEBUG = True
+    main(sys.argv)

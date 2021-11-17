@@ -69,13 +69,13 @@ def writeFormulaInformation(transaction, dataSheet, currentRow, writeToLog):
     Helper.writeToFile(writeToLog, 'TotPrem', dataSheet,
                        18, currentRow, """=IF([SYM]="","",SUMIFS([NetPrem],[Trade'#],[[Trade'#]],[Leg],"<="&[Leg]))""", moneyFormat=True)
     Helper.writeToFile(writeToLog, 'Days', dataSheet,
-                       19, currentRow, """=IF(INDIRECT("RC[-14]", FALSE)="DEP",0,
-IF(INDIRECT("RC[-14]", FALSE)="DIV",0,
-IF(INDIRECT("RC[-14]", FALSE)="LS",TODAY() - INDIRECT("RC[-13]", FALSE),
-IF(INDIRECT("RC[-14]", FALSE)="AS",TODAY() - INDIRECT("RC[-13]", FALSE),
-IF(INDIRECT("RC[-12]", FALSE)>0,
-IF(INDIRECT("RC[-12]", FALSE) - INDIRECT("RC[-13]", FALSE)>0,INDIRECT("RC[-12]", FALSE) - INDIRECT("RC[-13]", FALSE),1),
-INDIRECT("RC[-11]", FALSE) - INDIRECT("RC[-13]", FALSE))))))""")
+                       19, currentRow, """=IF(INDIRECT("RC[-15]", FALSE)="DEP",0,
+IF(INDIRECT("RC[-15]", FALSE)="DIV",0,
+IF(INDIRECT("RC[-15]", FALSE)="LS",TODAY() - INDIRECT("RC[-14]", FALSE),
+IF(INDIRECT("RC[-15]", FALSE)="AS",TODAY() - INDIRECT("RC[-14]", FALSE),
+IF(INDIRECT("RC[-13]", FALSE)>0,
+IF(INDIRECT("RC[-13]", FALSE) - INDIRECT("RC[-14]", FALSE)>0,INDIRECT("RC[-13]", FALSE) - INDIRECT("RC[-14]", FALSE),1),
+INDIRECT("RC[-12]", FALSE) - INDIRECT("RC[-14]", FALSE))))))""")
     Helper.writeToFile(writeToLog, 'Cap', dataSheet,
                        20, currentRow, """=IF([TransType]="SP",100*[Strike]*[['#Contracts]],
 IF([TransType]="LS",[Strike]*[['#Contracts]],

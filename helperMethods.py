@@ -5,6 +5,7 @@ from openpyxl import load_workbook
 import openpyxl
 import datetime
 
+DEBUG = False
 
 def printTransactions(array, info):
     print(info)
@@ -36,12 +37,9 @@ def writeWithNewLine(writer, message):
 
 def writeToFile(writer, message, sheet=None, column=None, row=None, value=None, dateFormat=None, moneyFormat=None,
                 percentFormat=None, color=None, twoDecimalsFormat=None):
-    writeWithNewLine(writer, message)
+    if DEBUG == True:
+        writeToLog(writer, message, sheet, column, row, value)
     if sheet and column and row and value:
-        writeWithNewLine(writer, 'sheet: ' + str(sheet))
-        writeWithNewLine(writer, 'column: ' + str(column))
-        writeWithNewLine(writer, 'row: ' + str(row))
-        writeWithNewLine(writer, 'value: ' + str(value))
         sheet.cell(column=column, row=row, value=value)
         if dateFormat:
             sheet.cell(
@@ -61,7 +59,17 @@ def writeToFile(writer, message, sheet=None, column=None, row=None, value=None, 
         if twoDecimalsFormat:
             sheet.cell(
                 row=row, column=column).number_format = '0.00'
+
+
+def writeToLog(writer, message, sheet, column, row, value):
+    writeWithNewLine(writer, message)
+    if sheet and column and row and value:
+        writeWithNewLine(writer, 'sheet: ' + str(sheet))
+        writeWithNewLine(writer, 'column: ' + str(column))
+        writeWithNewLine(writer, 'row: ' + str(row))
+        writeWithNewLine(writer, 'value: ' + str(value))
     writeWithNewLine(writer, '--------------------')
+
 
 
 def getMonthNumber(monthSpelledOut):
