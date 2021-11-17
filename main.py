@@ -26,7 +26,14 @@ def getTransactions(transactionWorkbook, portfolioWorkbook):
     return alreadyReadTransactions, openTransactions, newTransactions, maximumTradeNumber, allWriteableTransactions
 
 
-def main(args):
+def checkDebug():
+    if len(sys.argv) > 1 and sys.argv[1] == 'DEBUG':
+        Helper.DEBUG = True
+
+
+def main():
+    checkDebug()
+
     try:
         transactionWorkbook, portfolioWorkbook = InitialTransactionReader.openWorksbooks()
         alreadyReadTransactions, openTransactions, newTransactions, maximumTradeNumber, allWriteableTransactions = getTransactions(
@@ -54,6 +61,4 @@ def main(args):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1 and sys.argv[1] == 'DEBUG':
-        Helper.DEBUG = True
-    main(sys.argv)
+    main()
